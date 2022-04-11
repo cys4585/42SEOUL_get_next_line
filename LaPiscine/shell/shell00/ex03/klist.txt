@@ -1,6 +1,0 @@
-Credentials cache: API:5BDF7BF3-AE3E-49E5-926C-F223D37757A3
-        Principal: youngcho@42SEOUL.KR
-
-  Issued                Expires               Principal
-Jan  5 12:48:46 2022  Jan  5 22:48:46 2022  krbtgt/42SEOUL.KR@42SEOUL.KR
-Jan  5 12:48:48 2022  Jan  5 22:48:46 2022  HTTP/student-storage.42seoul.kr@42SEOUL.KR
