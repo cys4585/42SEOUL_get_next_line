@@ -6,7 +6,7 @@
 /*   By: youngcho <youngcho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 14:17:09 by youngcho          #+#    #+#             */
-/*   Updated: 2022/05/02 19:05:32 by youngcho         ###   ########.fr       */
+/*   Updated: 2022/05/03 19:06:51 by youngcho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,32 +39,14 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 	return (i);
 }
 
-size_t	ft_strlcat(char *dst, const char *src, size_t dstsize)
-{
-	size_t	dst_len;
-	size_t	src_len;
-	size_t	i;
-
-	dst_len = ft_strlen(dst);
-	src_len = ft_strlen(src);
-	if (dstsize == 0 || dstsize < dst_len)
-		return (dstsize + src_len);
-	i = 0;
-	while (dst_len + i + 1 < dstsize && src[i])
-	{
-		dst[dst_len + i] = src[i];
-		i++;
-	}
-	dst[dst_len + i] = '\0';
-	return (dst_len + src_len);
-}
-
 char	*ft_strdup(const char *s1)
 {
 	int		len;
 	char	*dst;
 	int		i;
 
+	if (s1 == NULL)
+		return (NULL);
 	len = ft_strlen(s1);
 	dst = (char *)malloc(sizeof(char) * (len + 1));
 	if (dst == NULL)
@@ -90,15 +72,31 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	if (s1 == NULL)
 		return (ft_strdup(s2));
 	if (s2 == NULL)
-        return ((char *)s1);
+		return ((char *)s1);
 	len_s1 = ft_strlen(s1);
 	len_s2 = ft_strlen(s2);
 	new_str = (char *)malloc(sizeof(char) * (len_s1 + len_s2 + 1));
 	if (new_str != NULL)
-    {
-        ft_strlcpy(new_str, s1, len_s1 + 1);
-        ft_strlcat(new_str, s2, len_s1 + len_s2 + 1);
-    }
-    free((void *)s1);
+	{
+		ft_strlcpy(new_str, s1, len_s1 + 1);
+		ft_strlcpy(new_str + len_s1, s2, len_s2 + 1);
+	}
+	free((void *)s1);
 	return (new_str);
+}
+
+int	get_nl_idx(char *s)
+{
+	int	i;
+
+	i = 0;
+	while (s[i])
+	{
+		if (s[i] == '\n')
+			return (i);
+		i++;
+	}
+	if (s[i] == '\n')
+		return (i);
+	return (-1);
 }
