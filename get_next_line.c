@@ -6,113 +6,103 @@
 /*   By: youngcho <youngcho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 14:22:46 by youngcho          #+#    #+#             */
-/*   Updated: 2022/05/03 20:11:44 by youngcho         ###   ########.fr       */
+/*   Updated: 2022/05/04 18:57:33 by youngcho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 #include <stdio.h>
 
-t_list	*ft_lstnew(int fd, char **str)
+char	*split_i(char *str, int i, char **backup_str)
 {
-	t_list	*new;
-	char	*nl_str;
-	int		nl_idx;
+	char	*tmp_str;
 
-	new = malloc(sizeof(t_list));
-	if (new == NULL)
-		return (NULL);
-	new->fd = fd;
-	new->str = NULL;
-	new->next = NULL;
-	new->prev = NULL;
-	if (fd == -1)
-		return (new);
-	printf("####\n%s\n####\n", *str);
-	nl_str = *str;
-	if (nl_str == NULL)
-		return (NULL);
-	nl_idx = get_nl_idx(nl_str);
-	if (nl_idx != -1)
-	{
-		*str = ft_strdup(nl_str + nl_idx + 1);
-		nl_str[nl_idx + 1] = '\0';
-	}
-	new->str = ft_strdup(nl_str);
-	free(nl_str);
-	return (new);
+	tmp_str = str;
+	*backup_str = ft_strdup(&str[i + 1]);
+	str[i + 1] = '\0';
+	str = ft_strdup(str);
+	free(tmp_str);
+	return (str);
 }
 
-void	ft_lstadd_back(t_list **lst, t_list *new)
-{
-	t_list	*node;
-
-	if (lst == NULL || new == NULL)
-		return ;
-	if (*lst == NULL)
-		*lst = new;
-	else
-	{
-		node = *lst;
-		while (node->next)
-			node = node->next;
-		node->next = new;
-		new->prev = node;
-	}
-}
-
-char	*read_one_cycle(int fd)
+char	*read_one_cycle(int fd, char **backup_str)
 {
 	char	buf[BUFFER_SIZE + 1];
 	int		read_bytes;
 	char	*str;
+	int		i;
 
 	str = NULL;
+	i = -1;
 	while (1)
 	{
 		read_bytes = read(fd, buf, BUFFER_SIZE);
 		if (read_bytes < 0)
 			return (NULL);
-		if (read_bytes == 0)
+		else if (read_bytes == 0)
 			return (str);
 		buf[read_bytes] = '\0';
 		str = ft_strjoin(str, buf);
 		if (str == NULL)
 			return (NULL);
-		if (get_nl_idx(str) != -1)
-			return (str);
+		while (str[++i])
+			if (str[i] == '\n')
+				return (split_i(str, i, backup_str));
 	}
+}
+
+char	*get_one_line(t_list *node, int fd)
+{
+	t_list	*backup_node;
+	char	*str;
+	char	*tmp;
+
+	str = NULL;
+	while (node)
+	{
+		printf("	63\n");
+		printf("	str:%s\nbackup_str:%s\n", node->str, node->backup_str);
+		if (node->fd == fd && node->str)
+		{
+			str = ft_strdup(node->str);
+			free(node->str);
+			node->str = NULL;
+			backup_node = node->prev;
+			while (backup_node)
+			{
+				if (backup_node->fd == fd && backup_node->backup_str)
+				{
+					tmp = str;
+					str = ft_strjoin(backup_node->backup_str, str);
+					free(tmp);
+					backup_node->backup_str = NULL;
+				}
+				backup_node = backup_node->prev;
+			}
+		}
+		node = node->next;
+	}
+	return (str);
 }
 
 char	*get_next_line(int fd)
 {
 	static t_list	*head;
-	t_list			*node;
-	char			*tmp_str;
-	char			*result_str;
+	char			*str;
+	char			*backup_str;
 
+	printf("92\n");
 	if (head == NULL)
-		ft_lstadd_back(&head, ft_lstnew(-1, NULL));
-	tmp_str = read_one_cycle(fd);
-	if (tmp_str != NULL)
-	{
-		ft_lstadd_back(&head, ft_lstnew(fd, &tmp_str));
-		printf("%s\n", tmp_str);
-		while (get_nl_idx(tmp_str) != -1)
-			ft_lstadd_back(&head, ft_lstnew(fd, &tmp_str));
-	}
-	node = head;
-	result_str = NULL;
-	while (node)
-	{
-		node = node->next;
-		if (node->fd == fd && node->str)
-		{
-			result_str = ft_strdup(node->str);
-			free((void *)node->str);
-			node->str = NULL;
-			break ;
-		}
-	}
-	return (result_str);
+		ft_lstadd_back(&head, -1, NULL, NULL);
+	printf("95\n");
+	str = get_one_line(head, fd);
+	if (str != NULL)
+		return (str);
+	printf("99\n");
+	str = read_one_cycle(fd, &backup_str);
+	printf("101\n");
+	if (str != NULL)
+		ft_lstadd_back(&head, fd, str, backup_str);
+	printf("104\n");
+	return (get_one_line(head, fd));
 }

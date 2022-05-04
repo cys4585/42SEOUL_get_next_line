@@ -6,21 +6,11 @@
 /*   By: youngcho <youngcho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 14:17:09 by youngcho          #+#    #+#             */
-/*   Updated: 2022/05/03 19:06:51 by youngcho         ###   ########.fr       */
+/*   Updated: 2022/05/04 18:53:46 by youngcho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
-
-size_t	ft_strlen(const char *s)
-{
-	size_t	size;
-
-	size = 0;
-	while (s[size])
-		size++;
-	return (size);
-}
 
 size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 {
@@ -39,14 +29,22 @@ size_t	ft_strlcpy(char *dst, const char *src, size_t dstsize)
 	return (i);
 }
 
+size_t	ft_strlen(const char *s)
+{
+	size_t	size;
+
+	size = 0;
+	while (s[size])
+		size++;
+	return (size);
+}
+
 char	*ft_strdup(const char *s1)
 {
 	int		len;
 	char	*dst;
 	int		i;
 
-	if (s1 == NULL)
-		return (NULL);
 	len = ft_strlen(s1);
 	dst = (char *)malloc(sizeof(char) * (len + 1));
 	if (dst == NULL)
@@ -61,42 +59,50 @@ char	*ft_strdup(const char *s1)
 	return (dst);
 }
 
-char	*ft_strjoin(char const *s1, char const *s2)
+char	*ft_strjoin(char const *old_str, char const *buf)
 {
 	char	*new_str;
-	size_t	len_s1;
-	size_t	len_s2;
+	size_t	len_old;
+	size_t	len_buf;
 
-	if (s1 == NULL && s2 == NULL)
+	if (old_str == NULL && buf == NULL)
 		return (NULL);
-	if (s1 == NULL)
-		return (ft_strdup(s2));
-	if (s2 == NULL)
-		return ((char *)s1);
-	len_s1 = ft_strlen(s1);
-	len_s2 = ft_strlen(s2);
-	new_str = (char *)malloc(sizeof(char) * (len_s1 + len_s2 + 1));
-	if (new_str != NULL)
-	{
-		ft_strlcpy(new_str, s1, len_s1 + 1);
-		ft_strlcpy(new_str + len_s1, s2, len_s2 + 1);
-	}
-	free((void *)s1);
+	if (old_str == NULL)
+		return (ft_strdup(buf));
+	if (buf == NULL)
+		return (ft_strdup(old_str));
+	len_old = ft_strlen(old_str);
+	len_buf = ft_strlen(buf);
+	new_str = (char *)malloc(sizeof(char) * (len_old + len_buf + 1));
+	if (new_str == NULL)
+		return (NULL);
+	ft_strlcpy(new_str, old_str, len_old + 1);
+	ft_strlcpy(new_str + len_old, buf, len_buf + 1);
+	free((void *)old_str);
 	return (new_str);
 }
 
-int	get_nl_idx(char *s)
+void	ft_lstadd_back(t_list **lst, int fd, char *str, char *backup_str)
 {
-	int	i;
+	t_list	*new;
+	t_list	*node;
 
-	i = 0;
-	while (s[i])
+	if (lst == NULL)
+		return ;
+	new = malloc(sizeof(t_list));
+	if (new == NULL)
+		return ;
+	new->fd = fd;
+	if (fd == -1)
 	{
-		if (s[i] == '\n')
-			return (i);
-		i++;
+		*lst = new;
+		return ;
 	}
-	if (s[i] == '\n')
-		return (i);
-	return (-1);
+	new->str = str;
+	new->backup_str = backup_str;
+	node = *lst;
+	while (node->next)
+		node = node->next;
+	node->next = new;
+	new->prev = node;
 }
