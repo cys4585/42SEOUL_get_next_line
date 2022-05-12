@@ -6,7 +6,7 @@
 /*   By: youngcho <youngcho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 14:17:09 by youngcho          #+#    #+#             */
-/*   Updated: 2022/05/11 13:00:28 by youngcho         ###   ########.fr       */
+/*   Updated: 2022/05/12 13:50:50 by youngcho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,4 +80,31 @@ char	*ft_strjoin(char const *old_str, char const *buf)
 	ft_strlcpy(new_str + len_old, buf, len_buf + 1);
 	free((void *)old_str);
 	return (new_str);
+}
+
+char	*split_nl(char *str, char **backup_str)
+{
+	char	*tmp_str;
+	int		i;
+
+	i = 0;
+	if (str == NULL)
+		return (NULL);
+	while (str[i])
+	{
+		if (str[i] == '\n')
+			break ;
+		i++;
+	}
+	if (str[i] == '\0')
+		return (NULL);
+	tmp_str = str;
+	if (str[i + 1] == '\0')
+		*backup_str = NULL;
+	else
+		*backup_str = ft_strdup(&str[i + 1]);
+	str[i + 1] = '\0';
+	str = ft_strdup(str);
+	free(tmp_str);
+	return (str);
 }
