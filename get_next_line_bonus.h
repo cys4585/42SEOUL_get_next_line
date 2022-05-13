@@ -6,7 +6,7 @@
 /*   By: youngcho <youngcho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 14:18:02 by youngcho          #+#    #+#             */
-/*   Updated: 2022/05/13 19:47:46 by youngcho         ###   ########.fr       */
+/*   Updated: 2022/05/13 19:55:10 by youngcho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,8 @@ char	*ft_strdup(const char *s1);
 char	*ft_strjoin(char const *old_str, char const *buf);
 char	*split_nl(char *str, char **backup_str);
 
-void	lstadd_back(t_list **tail_p, int fd, char *str, char **backup_str);
 char	*read_one_cycle(int fd, char **backup_str);
+void	lstadd_back(t_list **tail_p, int fd, char *str, char **backup_str);
 char	*get_backup_str_from_lst(t_list **lst, int fd);
 char	*get_str_from_lst(t_list **lst, int fd, t_list *node);
 char	*get_next_line(int fd);

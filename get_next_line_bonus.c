@@ -6,11 +6,38 @@
 /*   By: youngcho <youngcho@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/02 14:22:46 by youngcho          #+#    #+#             */
-/*   Updated: 2022/05/13 19:48:11 by youngcho         ###   ########.fr       */
+/*   Updated: 2022/05/13 19:54:40 by youngcho         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
+
+char	*read_one_cycle(int fd, char **backup_str)
+{
+	char	buf[BUFFER_SIZE + 1];
+	int		read_bytes;
+	char	*str;
+	int		i;
+
+	*backup_str = NULL;
+	str = NULL;
+	i = 0;
+	while (1)
+	{
+		read_bytes = read(fd, buf, BUFFER_SIZE);
+		if (read_bytes < 0)
+			return (NULL);
+		else if (read_bytes == 0)
+			return (str);
+		buf[read_bytes] = '\0';
+		str = ft_strjoin(str, buf);
+		if (str == NULL)
+			return (NULL);
+		while (str[i])
+			if (str[i++] == '\n')
+				return (split_nl(str, backup_str));
+	}
+}
 
 void	lstadd_back(t_list **tail_p, int fd, char *str, char **backup_str)
 {
@@ -39,33 +66,6 @@ void	lstadd_back(t_list **tail_p, int fd, char *str, char **backup_str)
 		new->backup_str = *backup_str;
 	else
 		lstadd_back(&new, fd, tmp_str, backup_str);
-}
-
-char	*read_one_cycle(int fd, char **backup_str)
-{
-	char	buf[BUFFER_SIZE + 1];
-	int		read_bytes;
-	char	*str;
-	int		i;
-
-	*backup_str = NULL;
-	str = NULL;
-	i = 0;
-	while (1)
-	{
-		read_bytes = read(fd, buf, BUFFER_SIZE);
-		if (read_bytes < 0)
-			return (NULL);
-		else if (read_bytes == 0)
-			return (str);
-		buf[read_bytes] = '\0';
-		str = ft_strjoin(str, buf);
-		if (str == NULL)
-			return (NULL);
-		while (str[i])
-			if (str[i++] == '\n')
-				return (split_nl(str, backup_str));
-	}
 }
 
 char	*get_backup_str_from_lst(t_list **lst, int fd)
